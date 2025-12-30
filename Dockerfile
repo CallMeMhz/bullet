@@ -21,6 +21,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 FROM python:3.13-slim
 
+# Install tzdata for timezone support
+RUN apt-get update && apt-get install -y --no-install-recommends tzdata \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 COPY --from=builder /app/.venv /app/.venv
@@ -29,6 +33,7 @@ COPY --from=builder /app/app ./app
 ENV PATH="/app/.venv/bin:$PATH"
 ENV HOST=0.0.0.0
 ENV PORT=5032
+ENV TZ=Asia/Shanghai
 
 EXPOSE 5032
 
