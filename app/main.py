@@ -9,7 +9,6 @@ from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 
 from app.config import get_settings
-from app.models.alert import AlertGroup
 from app.router import AlertRouter, load_routes_config
 from app.sources.grafana import GrafanaSource
 from app.sources.base import BaseSource

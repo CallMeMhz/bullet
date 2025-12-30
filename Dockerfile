@@ -1,13 +1,11 @@
-# syntax=docker/dockerfile:1
 FROM python:3.13-slim AS builder
 
-# Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
 
-# Copy dependency files
-COPY pyproject.toml uv.lock ./
+# Copy project files needed for build
+COPY pyproject.toml uv.lock README.md ./
 
 # Install dependencies
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -25,13 +23,8 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-# Copy virtual environment from builder
 COPY --from=builder /app/.venv /app/.venv
-
-# Copy application code
 COPY --from=builder /app/app ./app
-
-# Copy default config (can be overridden by mount)
 COPY routes.yaml.example ./routes.yaml
 
 ENV PATH="/app/.venv/bin:$PATH"
@@ -41,4 +34,3 @@ ENV PORT=5032
 EXPOSE 5032
 
 CMD ["python", "-m", "app.main"]
-
