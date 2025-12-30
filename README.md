@@ -1,4 +1,4 @@
-# Signal Box
+# Bullet
 
 多来源 Webhook 转发服务，接收各种监控系统的报警并根据来源和标签路由到不同的通知渠道。
 
@@ -11,7 +11,7 @@
        │                   │                   │
        ▼                   ▼                   ▼
 ┌──────────────────────────────────────────────────────┐
-│                    Signal Box                        │
+│                      Bullet                          │
 │  ┌─────────┐  ┌─────────┐  ┌─────────┐              │
 │  │ Grafana │  │Alertmgr │  │ Generic │  Sources     │
 │  │ Parser  │  │ Parser  │  │ Parser  │              │
@@ -41,7 +41,7 @@ cp routes.yaml.example routes.yaml
 vim routes.yaml
 
 # 启动
-uv run signal-box
+uv run bullet
 ```
 
 ## 配置示例
@@ -89,7 +89,7 @@ routes:
 ## 项目结构
 
 ```
-signal_box/
+bullet/
 ├── app/
 │   ├── main.py           # FastAPI 应用
 │   ├── config.py         # 配置

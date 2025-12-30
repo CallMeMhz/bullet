@@ -1,4 +1,4 @@
-"""Signal Box - FastAPI application for webhook relay."""
+"""Bullet - FastAPI application for webhook relay."""
 
 import logging
 from contextlib import asynccontextmanager
@@ -59,18 +59,18 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         logger.exception(f"Failed to load routes config: {e}")
         router = None
 
-    logger.info("Signal Box started")
+    logger.info("Bullet started")
 
     yield
 
     # Cleanup on shutdown
     router = None
     sources.clear()
-    logger.info("Signal Box stopped")
+    logger.info("Bullet stopped")
 
 
 app = FastAPI(
-    title="Signal Box",
+    title="Bullet",
     description="Webhook relay service for alerts with source-based and label-based routing",
     version="0.3.0",
     lifespan=lifespan,

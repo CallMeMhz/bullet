@@ -1,4 +1,4 @@
-"""Configuration management for Signal Box."""
+"""Configuration management for Bullet."""
 
 from functools import lru_cache
 from pathlib import Path

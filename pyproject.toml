@@ -1,5 +1,5 @@
 [project]
-name = "signal-box"
+name = "bullet"
 version = "0.3.0"
 description = "Webhook relay service for alerts"
 readme = "README.md"
@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [project.scripts]
-signal-box = "app.main:run"
+bullet = "app.main:run"
 
 [build-system]
 requires = ["hatchling"]
