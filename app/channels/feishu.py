@@ -5,7 +5,10 @@ import hmac
 import base64
 import time
 import logging
+from datetime import datetime, timezone
 from typing import Any
+from zoneinfo import ZoneInfo
+import os
 
 import httpx
 
@@ -62,7 +65,13 @@ class FeishuChannel(BaseChannel):
                 "text": {"tag": "lark_md", "content": f"**详情:** {alert.description}"},
             })
 
-        time_str = alert.starts_at.strftime("%Y-%m-%d %H:%M:%S")
+        # Convert to local timezone
+        local_tz = ZoneInfo(os.environ.get("TZ", "Asia/Shanghai"))
+        starts_at = alert.starts_at
+        if starts_at.tzinfo is None:
+            starts_at = starts_at.replace(tzinfo=timezone.utc)
+        local_time = starts_at.astimezone(local_tz)
+        time_str = local_time.strftime("%Y-%m-%d %H:%M:%S")
         elements.append({
             "tag": "div",
             "text": {"tag": "lark_md", "content": f"**触发时间:** {time_str}"},
