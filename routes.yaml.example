@@ -1,0 +1,64 @@
+# Signal Box 路由配置示例
+#
+# 路由规则按顺序匹配，第一个匹配的规则会被使用
+# 匹配条件支持:
+#   - source: 报警来源 (grafana, alertmanager, 等)
+#   - labels: 报警标签 (所有指定标签必须匹配)
+# 如果没有匹配的规则，报警会被丢弃
+
+routes:
+  # 示例 1: 只匹配 Grafana 来源的后端项目报警
+  - name: "grafana-backend"
+    match:
+      source: grafana
+      labels:
+        project: "backend-api"
+    channels:
+      - type: feishu
+        webhook_url: "https://open.feishu.cn/open-apis/bot/v2/hook/xxx-backend"
+
+  # 示例 2: 匹配特定来源和多个标签
+  - name: "grafana-frontend-prod"
+    match:
+      source: grafana
+      labels:
+        project: "frontend"
+        env: "production"
+    channels:
+      - type: feishu
+        webhook_url: "https://open.feishu.cn/open-apis/bot/v2/hook/xxx-frontend"
+
+  # 示例 3: 只根据标签匹配，不限来源
+  - name: "infra-alerts"
+    match:
+      labels:
+        team: "infrastructure"
+    channels:
+      - type: feishu
+        webhook_url: "https://open.feishu.cn/open-apis/bot/v2/hook/xxx-infra"
+
+  # 示例 4: 只根据来源匹配，不限标签
+  - name: "all-alertmanager"
+    match:
+      source: alertmanager
+    channels:
+      - type: feishu
+        webhook_url: "https://open.feishu.cn/open-apis/bot/v2/hook/xxx-alertmanager"
+
+  # 示例 5: 发送到多个渠道
+  - name: "critical-alerts"
+    match:
+      labels:
+        severity: "critical"
+    channels:
+      - type: feishu
+        webhook_url: "https://open.feishu.cn/open-apis/bot/v2/hook/xxx-oncall"
+      - type: feishu
+        webhook_url: "https://open.feishu.cn/open-apis/bot/v2/hook/xxx-managers"
+
+  # 示例 6: 兜底路由 (匹配所有，放最后)
+  - name: "catch-all"
+    match: {}
+    channels:
+      - type: feishu
+        webhook_url: "https://open.feishu.cn/open-apis/bot/v2/hook/xxx-default"
