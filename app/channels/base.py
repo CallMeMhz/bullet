@@ -3,7 +3,7 @@
 import logging
 from abc import ABC, abstractmethod
 
-from app.models.alert import AlertGroup
+from app.models.event import Event
 
 logger = logging.getLogger(__name__)
 
@@ -24,16 +24,16 @@ class BaseChannel(ABC):
         ...
 
     @abstractmethod
-    async def send(self, alert_group: AlertGroup) -> bool:
-        """Send alert to the channel."""
+    async def send(self, event: Event) -> bool:
+        """Send an event to the channel."""
         ...
 
-    async def send_safe(self, alert_group: AlertGroup) -> bool:
-        """Send alert with error handling."""
+    async def send_safe(self, event: Event) -> bool:
+        """Send event with error handling."""
         if not self.enabled:
             return False
         try:
-            return await self.send(alert_group)
+            return await self.send(event)
         except Exception as e:
             logger.exception(f"Failed to send to channel {self.name}: {e}")
             return False

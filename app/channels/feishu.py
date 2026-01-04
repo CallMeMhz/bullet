@@ -5,6 +5,7 @@ import hmac
 import base64
 import time
 import logging
+import json
 from datetime import datetime, timezone
 from typing import Any
 from zoneinfo import ZoneInfo
@@ -14,6 +15,7 @@ import httpx
 
 from app.channels.base import BaseChannel
 from app.models.alert import Alert, AlertGroup
+from app.models.event import Event
 
 logger = logging.getLogger(__name__)
 
@@ -134,8 +136,28 @@ class FeishuChannel(BaseChannel):
             "card": {"header": header, "elements": elements},
         }
 
-    async def send(self, alert_group: AlertGroup) -> bool:
-        message = self._build_card_message(alert_group)
+    def _build_text_message(self, event: Event) -> dict[str, Any]:
+        payload_json = json.dumps(event.payload, ensure_ascii=False, indent=2, default=str)
+        labels_json = json.dumps(event.labels or {}, ensure_ascii=False, default=str)
+        text = (
+            f"[{(event.source or '').upper()}] {event.type or 'event'}\n"
+            f"labels: {labels_json}\n"
+            f"payload:\n{payload_json}"
+        )
+        # Feishu "text" message
+        return {"msg_type": "text", "content": {"text": text}}
+
+    async def send(self, event: Event) -> bool:
+        # If this is an alert event and looks like AlertGroup payload, keep the rich card.
+        message: dict[str, Any]
+        if event.type == "alert":
+            try:
+                alert_group = AlertGroup.model_validate(event.payload)
+                message = self._build_card_message(alert_group)
+            except Exception:
+                message = self._build_text_message(event)
+        else:
+            message = self._build_text_message(event)
 
         if self._secret:
             timestamp = str(int(time.time()))

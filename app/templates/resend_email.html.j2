@@ -1,0 +1,19 @@
+<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial;color:#111827;">
+  <div style="padding:12px 14px;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb;">
+    <div style="font-size:18px;font-weight:800;margin-bottom:6px;">
+      {{ title }}
+    </div>
+    <div style="color:#6b7280;font-size:12px;line-height:1.6;">
+      {% if event.source %}<span><strong>source</strong>: {{ event.source }}</span>{% endif %}
+      {% if event.type %}<span style="margin-left:10px;"><strong>type</strong>: {{ event.type }}</span>{% endif %}
+      {% if labels %}<span style="margin-left:10px;"><strong>labels</strong>: {{ labels }}</span>{% endif %}
+    </div>
+  </div>
+
+  <div style="margin-top:12px;padding:12px 14px;border:1px solid #e5e7eb;border-radius:10px;background:#ffffff;">
+    <div style="font-weight:700;margin-bottom:6px;">Payload</div>
+    <pre style="margin:0;white-space:pre-wrap;word-break:break-word;">{{ payload_json }}</pre>
+  </div>
+</div>
+
+

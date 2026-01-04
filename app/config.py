@@ -24,6 +24,11 @@ class Settings(BaseSettings):
     # Routes configuration
     routes_config: str = Field(default="routes.yaml")
 
+    # Resend email channel (optional)
+    resend_api_key: str = Field(default="")
+    resend_from_email: str = Field(default="")
+    resend_api_url: str = Field(default="https://api.resend.com/emails")
+
     @property
     def routes_config_path(self) -> Path:
         return Path(self.routes_config)

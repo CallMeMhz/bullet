@@ -2,12 +2,12 @@
 #
 # 路由规则按顺序匹配，第一个匹配的规则会被使用
 # 匹配条件支持:
-#   - source: 报警来源 (grafana, alertmanager, 等)
-#   - labels: 报警标签 (所有指定标签必须匹配)
-# 如果没有匹配的规则，报警会被丢弃
+#   - source: 事件来源 (grafana, alertmanager, 等)
+#   - labels: 事件标签 (所有指定标签必须匹配)
+# 如果没有匹配的规则，事件会被丢弃
 
 routes:
-  # 示例 1: 只匹配 Grafana 来源的后端项目报警
+  # 示例 1: 只匹配 Grafana 来源的后端项目事件（报警只是其中一种场景）
   - name: "grafana-backend"
     match:
       source: grafana
@@ -62,3 +62,22 @@ routes:
     channels:
       - type: feishu
         webhook_url: "https://open.feishu.cn/open-apis/bot/v2/hook/xxx-default"
+
+  # 示例 7: 发送邮件（Resend）
+  - name: "critical-email"
+    match:
+      labels:
+        severity: "critical"
+    channels:
+      - type: resend_email
+        # 建议把 API Key 放在环境变量 RESEND_API_KEY
+        # api_key: "re_xxxxxxxxx"
+        from: "Bullet <noreply@your-domain.com>"
+        to:
+          - "oncall@your-domain.com"
+          - "devops@your-domain.com"
+        subject_prefix: "[SRE] "
+        # 可选：自定义模板（Jinja2），不填则用内置默认模板
+        # template_path: "/abs/path/to/resend_email.html.j2"
+        # 可选：自定义 subject 模板（Jinja2 from_string）
+        # subject_template: "[{{ event.source|upper }}] {{ event.type }}"

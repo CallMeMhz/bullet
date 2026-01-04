@@ -138,7 +138,7 @@ async def _process_webhook(source_name: str, payload: dict[str, Any]) -> JSONRes
         f"alerts={len(alert_group.alerts)}"
     )
 
-    # Route the alert
+    # Route the alert (internally wrapped into a generic Event)
     results = await router.route_alert(alert_group)
 
     # No matching route - discard
