@@ -81,11 +81,15 @@ class FeishuChannel(BaseChannel):
 
         labels = {k: v for k, v in alert.labels.items() if k != "alertname"}
         if labels:
-            label_str = " | ".join(f"`{k}={v}`" for k, v in labels.items())
             elements.append({
                 "tag": "div",
-                "text": {"tag": "lark_md", "content": f"**标签:** {label_str}"},
+                "text": {"tag": "lark_md", "content": "**标签:**"},
             })
+            for k, v in labels.items():
+                elements.append({
+                    "tag": "div",
+                    "text": {"tag": "plain_text", "content": f"  • {k}: {v}"},
+                })
 
         if alert.generator_url:
             elements.append({
@@ -99,20 +103,16 @@ class FeishuChannel(BaseChannel):
         status = alert_group.status
         status_text = "告警触发" if status == "firing" else "告警恢复"
         status_emoji = "🚨" if status == "firing" else "✅"
-        source_tag = f"[{alert_group.source.upper()}]"
+
+        # 获取告警规则名作为标题
+        alert_name = alert_group.alerts[0].name if alert_group.alerts else "Unknown"
 
         header = {
-            "title": {"tag": "plain_text", "content": f"{status_emoji} {source_tag} {status_text}"},
+            "title": {"tag": "plain_text", "content": f"{status_emoji} {alert_name} - {status_text}"},
             "template": self._get_status_color(status),
         }
 
         elements: list[dict[str, Any]] = []
-
-        if alert_group.receiver:
-            elements.append({
-                "tag": "div",
-                "text": {"tag": "lark_md", "content": f"**接收器:** {alert_group.receiver}"},
-            })
 
         for i, alert in enumerate(alert_group.alerts):
             if i > 0:
