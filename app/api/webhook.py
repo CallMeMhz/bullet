@@ -12,6 +12,7 @@ from app.models.notification_group import NotificationGroup
 from app.models.project import Project
 from app.models.ticket import EventType, Ticket, TicketStatus
 from app.services.notification import NotificationService
+from app.sources.aliyun_pai import AliyunSource
 from app.sources.base import BaseSource
 from app.sources.grafana import GrafanaSource
 
@@ -27,6 +28,7 @@ def get_sources() -> dict[str, BaseSource]:
     """Get or initialize source parsers."""
     if not _sources:
         _sources["grafana"] = GrafanaSource()
+        _sources["aliyun"] = AliyunSource()
         # Add more sources here as needed
     return _sources
 
