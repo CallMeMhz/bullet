@@ -7,7 +7,7 @@ from bson import ObjectId
 
 from app.channels.feishu import FeishuChannel, TEMPLATE_CARD_KEY
 from app.channels.resend_email import ResendEmailChannel
-from app.channels.slack import SlackChannel
+from app.channels.slack import SlackWebhookChannel, SlackBotChannel
 from app.channels.twilio_sms import TwilioSMSChannel
 from app.config import get_settings
 from app.models.contact import Contact
@@ -181,14 +181,23 @@ class NotificationService:
             else:
                 logger.warning("No phone numbers found in contacts")
 
-        elif config.type == ChannelType.SLACK:
+        elif config.type == ChannelType.SLACK_WEBHOOK:
             for contact in contacts:
                 if contact.slack_webhook_url:
-                    channel = SlackChannel(webhook_url=contact.slack_webhook_url)
+                    channel = SlackWebhookChannel(webhook_url=contact.slack_webhook_url)
                     success = await channel.send_safe(event)
-                    results[f"slack:{contact.name}"] = success
+                    results[f"slack-webhook:{contact.name}"] = success
                 else:
                     logger.warning(f"Contact {contact.name} has no slack_webhook_url")
+
+        elif config.type == ChannelType.SLACK_BOT:
+            for contact in contacts:
+                if contact.slack_channel_id:
+                    channel = SlackBotChannel(bot_token=settings.slack_bot_token, channel_id=contact.slack_channel_id)
+                    success = await channel.send_safe(event)
+                    results[f"slack-bot:{contact.name}"] = success
+                else:
+                    logger.warning(f"Contact {contact.name} has no slack_bot_token")
 
         return results
 
