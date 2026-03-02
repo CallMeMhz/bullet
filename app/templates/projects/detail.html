@@ -45,8 +45,17 @@
             </div>
         </div>
         <div>
-            <label class="text-sm text-gray-500">请求示例</label>
-            <code class="text-xs bg-gray-100 px-2 py-1 block mt-1">POST {{ base_url }}/webhook/{{ namespace.slug }}/{{ project.id }}?source=grafana</code>
+            <label class="text-sm text-gray-500">curl 请求示例</label>
+            <pre class="text-xs bg-gray-100 px-3 py-2 mt-1 overflow-x-auto rounded"><code>curl -X POST '{{ base_url }}/webhook/{{ namespace.slug }}/{{ project.id }}?source=custom' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "title": "订单异常通知",
+    "description": "订单 ORD-12345 支付超时",
+    "severity": "warning",
+    "order_id": "ORD-12345",
+    "amount": 99.9
+  }'</code></pre>
+            <p class="text-xs text-gray-500 mt-1">JSON body 中的额外字段会存入 <code>payload</code>，可在模板中通过 <code>{% raw %}{{ payload.order_id }}{% endraw %}</code> 访问。</p>
         </div>
     </div>
 </div>
@@ -194,6 +203,15 @@
         <div>
             <label class="form-label">描述</label>
             <textarea name="description" class="form-input" rows="2" placeholder="这是一条测试消息，用于验证通知配置是否正确。"></textarea>
+        </div>
+        <div class="mt-4">
+            <label class="form-label">自定义 Payload (JSON)</label>
+            <textarea name="payload" class="form-input font-mono text-sm" rows="4" placeholder='{
+  "order_id": "ORD-12345",
+  "amount": 99.9,
+  "customer": "张三"
+}'></textarea>
+            <p class="text-xs text-gray-500 mt-1">此 JSON 会作为 <code>payload</code> 注入模板，可通过 <code>{% raw %}{{ payload.order_id }}{% endraw %}</code> 等方式访问。留空则使用默认值 <code>{"test": true}</code>。</p>
         </div>
         <p class="text-xs text-gray-500 mt-2">测试消息将发送到第一级通知组（{{ bound_groups[0].name if bound_groups else '未配置' }}），不会创建实际工单。</p>
     </form>

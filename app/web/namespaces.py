@@ -1,5 +1,6 @@
 """Namespace and Project management routes."""
 
+import json
 import logging
 import re
 import secrets
@@ -494,6 +495,31 @@ async def send_test_message(
     ) or "这是一条测试消息，用于验证通知配置是否正确。"
     severity_raw = form_data.get("severity", "warning")
     severity = severity_raw if isinstance(severity_raw, str) else "warning"
+    payload_raw = form_data.get("payload", "")
+    payload_str = payload_raw.strip() if isinstance(payload_raw, str) else ""
+
+    # Parse custom payload JSON
+    if payload_str:
+        try:
+            custom_payload = json.loads(payload_str)
+            if not isinstance(custom_payload, dict):
+                return await _render_project_detail_with_test_result(
+                    request,
+                    namespace,
+                    project,
+                    user,
+                    test_result={"success": False, "message": "Payload 必须是 JSON 对象（如 {\"key\": \"value\"}）"},
+                )
+        except json.JSONDecodeError as e:
+            return await _render_project_detail_with_test_result(
+                request,
+                namespace,
+                project,
+                user,
+                test_result={"success": False, "message": f"Payload JSON 格式错误: {e}"},
+            )
+    else:
+        custom_payload = {"test": True}
 
     # Check if project has notification groups
     if not project.notification_group_ids:
@@ -523,7 +549,7 @@ async def send_test_message(
         project_id=str(project.id),
         source="test",
         status=TicketStatus.PENDING,
-        payload={"test": True},
+        payload=custom_payload,
         title=title,
         description=description,
         severity=severity,

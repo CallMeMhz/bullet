@@ -18,6 +18,45 @@
 <div class="alert alert-error mb-4">{{ error }}</div>
 {% endif %}
 
+<div class="card mb-4">
+    <details>
+        <summary class="cursor-pointer font-medium text-gray-700">可用模板变量</summary>
+        <div class="mt-3 text-sm text-gray-600 space-y-3">
+            <table class="table text-sm">
+                <thead>
+                    <tr>
+                        <th>变量</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>{% raw %}{{ ticket.title }}{% endraw %}</code></td><td>工单标题</td></tr>
+                    <tr><td><code>{% raw %}{{ ticket.description }}{% endraw %}</code></td><td>工单描述</td></tr>
+                    <tr><td><code>{% raw %}{{ ticket.severity }}{% endraw %}</code></td><td>严重级别 (critical / error / warning / info)</td></tr>
+                    <tr><td><code>{% raw %}{{ ticket.status }}{% endraw %}</code></td><td>工单状态</td></tr>
+                    <tr><td><code>{% raw %}{{ ticket.created_at }}{% endraw %}</code></td><td>创建时间</td></tr>
+                    <tr><td><code>{% raw %}{{ source }}{% endraw %}</code></td><td>来源 (grafana / alertmanager / custom 等)</td></tr>
+                    <tr><td><code>{% raw %}{{ payload.字段名 }}{% endraw %}</code></td><td>Webhook 原始 JSON 中的自定义字段</td></tr>
+                    <tr><td><code>{% raw %}{{ ack_url }}{% endraw %}</code></td><td>确认链接</td></tr>
+                    <tr><td><code>{% raw %}{{ detail_url }}{% endraw %}</code></td><td>工单详情页链接</td></tr>
+                    <tr><td><code>{% raw %}{{ project.name }}{% endraw %}</code></td><td>项目名称</td></tr>
+                    <tr><td><code>{% raw %}{{ notification_label }}{% endraw %}</code></td><td>通知标签 (如 "第3次通知" / "已升级")</td></tr>
+                    <tr><td><code>{% raw %}{{ is_escalated }}{% endraw %}</code></td><td>是否为升级通知</td></tr>
+                </tbody>
+            </table>
+            <div>
+                <p class="font-medium text-gray-700 mb-1">邮件模板示例片段：</p>
+                <pre class="text-xs bg-gray-100 px-3 py-2 rounded overflow-x-auto">{% raw %}&lt;h2&gt;{{ ticket.title }}&lt;/h2&gt;
+&lt;p&gt;严重级别: {{ ticket.severity }}&lt;/p&gt;
+&lt;p&gt;{{ ticket.description }}&lt;/p&gt;
+{% if payload.order_id %}&lt;p&gt;订单号: {{ payload.order_id }}&lt;/p&gt;{% endif %}
+&lt;p&gt;&lt;a href="{{ ack_url }}"&gt;点击确认&lt;/a&gt;&lt;/p&gt;{% endraw %}</pre>
+            </div>
+            <p class="text-xs text-gray-500"><strong>注意</strong>: <code>payload</code> 是上游 Webhook 请求的原始 JSON body，使用 <code>{% raw %}{{ payload.字段名 }}{% endraw %}</code> 访问其中的字段。不要使用 <code>{% raw %}{{ event.xxx }}{% endraw %}</code>，event 不是可用变量。</p>
+        </div>
+    </details>
+</div>
+
 <form method="POST" action="{{ '/notification-templates/' + (template.id | string) + '/edit' if template else '/notification-templates/new' }}">
     <div class="card mb-4">
         <h3 class="mb-4">基本信息</h3>
